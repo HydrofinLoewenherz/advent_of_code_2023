@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 fn main() {
+    let start = std::time::Instant::now();
     let cards = include_str!("../../data/day_4.txt");
 
     let base: i32 = 2;
@@ -29,5 +30,6 @@ fn main() {
         }
     }
 
-    println!("sum {sum}") // 23673
+    let elapsed = start.elapsed().as_secs_f64() * 1e3;
+    println!("{} ({:.3}ms)", sum, elapsed); // 23673
 }

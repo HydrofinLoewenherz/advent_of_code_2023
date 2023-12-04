@@ -3,7 +3,6 @@ use std::ops::{AddAssign};
 
 fn main() {
     let start = std::time::Instant::now();
-
     let cards = include_str!("../../data/day_4.txt");
 
     let mut amounts: HashMap<usize, i32> = HashMap::new();
