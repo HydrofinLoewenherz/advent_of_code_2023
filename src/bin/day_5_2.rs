@@ -10,7 +10,7 @@ struct RangeMap {
 
 impl RangeMap {
     fn map(&self, (start, range): (i64, i64)) -> Vec<(i64, i64, bool)> {
-        let mut mapped = Vec::new();
+        let mut mapped = Vec::with_capacity(3);
         // create unmapped
         if start < self.src_start {
             let s = start;
@@ -75,39 +75,26 @@ fn main() {
     }
 
     // apply maps until type matches 'location'
+    let mut vals_mapped: Vec<(i64, i64)> = Vec::with_capacity(vals.len());
+    let mut vals_unmapped: Vec<(i64, i64)> = Vec::with_capacity(vals.len());
     while vals_type != "location" {
         let (to, maps) = &maps[vals_type];
         vals_type = to;
-
-        let mut vals_next_type: Vec<(i64, i64)> = Vec::new();
         for map in maps {
-            let mut vals_next_map: Vec<(i64, i64)> = Vec::new();
-            for val in vals {
+            while let Some(val) = vals.pop() {
                 for (start, range, ok) in map.map(val) {
                     if ok {
-                        // try to find first that intersects to merge with
-                        let min_found = vals_next_type.iter()
-                            .enumerate()
-                            .find(|(_, (s, r))| {
-                                max(*s, start) < min(*s+*r, start+range)
-                            });
-                        match min_found {
-                            Some((min_index, (s, r))) => {
-                                let start = min(*s, start);
-                                let end = max(*s+*r, start+range);
-                                vals_next_type[min_index] = (start, end-start);
-                            }
-                            None => vals_next_type.push((start, range))
-                        }
+                        vals_mapped.push((start, range))
                     } else {
-                        // merge above seems to be enough optimization, no second merge required
-                        vals_next_map.push((start, range));
+                        vals_unmapped.push((start, range));
                     }
                 }
             }
-            vals = vals_next_map;
+            std::mem::swap(&mut vals, &mut vals_unmapped);
         }
-        vals.append(&mut vals_next_type);
+        vals.append(&mut vals_mapped);
+        vals_mapped.clear();
+        vals_unmapped.clear();
     }
 
     let result = vals.iter().min_by(|a, b| a.0.cmp(&b.0)).unwrap().0;
