@@ -5,21 +5,20 @@ fn main() {
     // parse input
     let mut lines = input.lines();
     let times = lines.next().unwrap()["Time:".len()..]
-        .trim()
         .split_whitespace()
         .map(|s| s.trim().parse::<i64>().unwrap() as f64)
         .collect::<Vec<_>>();
     let records = lines.next().unwrap()["Distance:".len()..]
-        .trim()
         .split_whitespace()
         .map(|s| s.trim().parse::<i64>().unwrap() as f64)
         .collect::<Vec<_>>();
 
-    // solve for upper/lower
+    // solve
+    let mut tmp = 0.0;
     let result = times.iter().zip(records).map(|(t, r)| {
-        let g = *t;
-        let a = 0.5 * (g - f64::sqrt(g * g - 4.0 * r));
-        let b = 0.5 * (f64::sqrt(g * g - 4.0 * r) + g);
+        tmp = f64::sqrt(*t * *t - 4.0 * r);
+        let a = 0.5 * (*t - tmp);
+        let b = 0.5 * (*t + tmp);
         b.ceil() as i32 - a as i32 - 1
     }).reduce(|acc, e| acc * e).unwrap();
 
