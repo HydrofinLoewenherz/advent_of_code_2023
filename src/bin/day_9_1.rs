@@ -1,11 +1,9 @@
-use rayon::prelude::*;
 
 fn main() {
     let start_time = std::time::Instant::now();
     let input = include_str!("../../data/day_9.txt");
 
     let result: i64 = input.lines()
-        .par_bridge()
         .map(|str| {
             let mut sum = 0;
             let mut nums = str.split_whitespace()
